@@ -8,6 +8,7 @@ namespace WorkCardAPI.Models
 {
     public class CreateWorkCardDto
     {
+
         [Required]
         [MaxLength(25)]
         public string CardNumber { get; set; }
