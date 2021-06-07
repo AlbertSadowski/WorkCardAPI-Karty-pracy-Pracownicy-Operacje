@@ -12,6 +12,7 @@ namespace WorkCardAPI.Controllers
     [ApiController]
     public class OperationsController : ControllerBase
     {
+
         private readonly IOperationService _operationService;
 
         public OperationsController(IOperationService operationService)
