@@ -12,7 +12,7 @@ namespace WorkCardAPI.Services
     public interface IWorkCardService
     {
         int Create(CreateWorkCardDto dto);
-        IEnumerable<WorkCardDto> GetAll();
+        IEnumerable<WorkCardDto> GetAll(string searchPhrase);
         WorkCardDto GetById(int id);
         bool Delete(int id);
         bool Update(int id, UpdateWorkCardDto dto);
@@ -77,12 +77,14 @@ namespace WorkCardAPI.Services
             return result;
         }
 
-        public IEnumerable<WorkCardDto> GetAll()
+        public IEnumerable<WorkCardDto> GetAll(string searchPhrase)
         {
             var workCards = _dbContext
                 .WorkCards
                 .Include(w => w.Employee)
                 .Include(w => w.Operations)
+                .Where(w => searchPhrase == null || (w.CardNumber.ToLower().Contains(searchPhrase.ToLower()) 
+                                                    || w.Technology.ToLower().Contains(searchPhrase.ToLower())))
                 .ToList();
 
             var workCardDtos = _mapper.Map<IEnumerable<WorkCardDto>>(workCards);
@@ -97,5 +99,7 @@ namespace WorkCardAPI.Services
 
             return workCard.Id;
         }
+
+    
     }
 }
