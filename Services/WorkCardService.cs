@@ -12,7 +12,7 @@ namespace WorkCardAPI.Services
     public interface IWorkCardService
     {
         int Create(CreateWorkCardDto dto);
-        IEnumerable<WorkCardDto> GetAll(string searchPhrase);
+        public PagedResult<WorkCardDto> GetAll(WorkCardQuery query);
         WorkCardDto GetById(int id);
         bool Delete(int id);
         bool Update(int id, UpdateWorkCardDto dto);
@@ -77,18 +77,28 @@ namespace WorkCardAPI.Services
             return result;
         }
 
-        public IEnumerable<WorkCardDto> GetAll(string searchPhrase)
+        public PagedResult<WorkCardDto> GetAll(WorkCardQuery query)
         {
-            var workCards = _dbContext
+            var baseQuery = _dbContext
                 .WorkCards
                 .Include(w => w.Employee)
                 .Include(w => w.Operations)
-                .Where(w => searchPhrase == null || (w.CardNumber.ToLower().Contains(searchPhrase.ToLower()) 
-                                                    || w.Technology.ToLower().Contains(searchPhrase.ToLower())))
-                .ToList();
+                .Where(w => query.SearchPhrase == null
+                            || (w.CardNumber.ToLower().Contains(query.SearchPhrase.ToLower())
+                            || w.Technology.ToLower().Contains(query.SearchPhrase.ToLower())));
 
+            var workCards = baseQuery
+                .Skip(query.PageSize * (query.PageNumber - 1))
+                .Take(query.PageSize)
+                .ToList();
+            
+            var totalItemsCount = baseQuery.Count();
+            
             var workCardDtos = _mapper.Map<IEnumerable<WorkCardDto>>(workCards);
-            return workCardDtos;
+
+            var result = new PagedResult<WorkCardDto>(workCardDtos, totalItemsCount, query.PageSize, query.PageNumber);
+
+            return result;
         }
 
         public int Create(CreateWorkCardDto dto)
@@ -100,6 +110,5 @@ namespace WorkCardAPI.Services
             return workCard.Id;
         }
 
-    
     }
 }

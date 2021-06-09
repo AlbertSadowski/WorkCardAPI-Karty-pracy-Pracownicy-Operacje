@@ -64,9 +64,9 @@ namespace WorkCardAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<WorkCardDto>> GetAll([FromQuery] string searchPhrase)
+        public ActionResult<IEnumerable<WorkCardDto>> GetAll([FromQuery]WorkCardQuery query)
         {
-            var workCardDtos = _workCardService.GetAll(searchPhrase);
+            var workCardDtos = _workCardService.GetAll(query);
 
             return Ok(workCardDtos);
         }
