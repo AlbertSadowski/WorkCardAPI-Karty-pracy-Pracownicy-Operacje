@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WorkCardAPI.Entities;
 using WorkCardAPI.Models;
@@ -87,6 +88,22 @@ namespace WorkCardAPI.Services
                             || (w.CardNumber.ToLower().Contains(query.SearchPhrase.ToLower())
                             || w.Technology.ToLower().Contains(query.SearchPhrase.ToLower())));
 
+            if (!string.IsNullOrEmpty(query.SortBy))
+            {
+                var columnsSelectors = new Dictionary<string, Expression<Func<WorkCard, object>>>
+                {
+                    { nameof(WorkCard.CardNumber), w => w.CardNumber },
+                    { nameof(WorkCard.Order), w => w.Order },
+                    { nameof(WorkCard.Technology), w => w.Technology }
+
+                };
+
+                var selectedColumn = columnsSelectors[query.SortBy];
+
+                baseQuery = query.SortDirection == SortDirection.ASC ?
+                    baseQuery.OrderBy(selectedColumn)
+                    : baseQuery.OrderByDescending(selectedColumn);
+            }
             var workCards = baseQuery
                 .Skip(query.PageSize * (query.PageNumber - 1))
                 .Take(query.PageSize)

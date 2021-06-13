@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkCardAPI.Entities;
+using WorkCardAPI.Models;
+using WorkCardAPI.Models.Validators;
 using WorkCardAPI.Services;
 
 namespace WorkCardAPI
@@ -34,6 +37,7 @@ namespace WorkCardAPI
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddScoped<IWorkCardService, WorkCardService>();
             services.AddScoped<IOperationService, OperationService>();
+            services.AddScoped<IValidator<WorkCardQuery>, WorkCardQueryValidator>();
             services.AddSwaggerGen();
             
         }
